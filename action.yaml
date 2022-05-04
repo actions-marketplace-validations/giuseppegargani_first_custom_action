@@ -56,10 +56,9 @@ runs:
     - run: goodbye.sh
       shell: bash
     - uses: malinskiy/action-android/install-sdk@release/0.0.8
-    
       # controlla il checksum di gradle
-    #- run: sh -c "$(curl -fsSL https://raw.githubusercontent.com/ZacSweers/check-gradle-checksums/master/check-gradle-checksums.sh)"
-      #shell: bash
+    - run: sh -c "$(curl -fsSL https://raw.githubusercontent.com/ZacSweers/check-gradle-checksums/master/check-gradle-checksums.sh)"
+      shell: bash
     #- uses: actions/setup-java@v1
       #with:
           #java-distribution: temurin

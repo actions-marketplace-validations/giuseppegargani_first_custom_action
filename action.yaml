@@ -55,6 +55,10 @@ runs:
       shell: bash          
     - run: goodbye.sh
       shell: bash
+    # qui comincia quello piu' specifico per android report!!!!
+    - name: install coreutils for macOs
+      run: brew install coreutils
+      shell: bash
     - uses: malinskiy/action-android/install-sdk@release/0.0.8
       # controlla il checksum di gradle
     - run: sh -c "$(curl -fsSL https://raw.githubusercontent.com/ZacSweers/check-gradle-checksums/master/check-gradle-checksums.sh)"

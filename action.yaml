@@ -28,6 +28,9 @@
 # Code file to execute when the docker container starts up (`entrypoint.sh`)
 #ENTRYPOINT ["/entrypoint.sh"]
 
+# Si possono anche eseguire files locali!!!!!!!!! purche' con il permesso di esecuzione!!!!
+# Si potrebbe anche scegliere di inserire una serie di operazioni in un file Linux!!! ma comunque potrebbe non essere necessario
+
 
 name: 'Barsali_Hello_World'
 description: 'Greet someone'
@@ -52,3 +55,15 @@ runs:
       shell: bash          
     - run: goodbye.sh
       shell: bash
+      # controlla il checksum di gradle
+    - run: sh -c "$(curl -fsSL https://raw.githubusercontent.com/ZacSweers/check-gradle-checksums/master/check-gradle-checksums.sh)"
+      shell: bash
+    - uses: actions/setup-java@v1
+      with:
+          #java-distribution: temurin
+          # inizialmente il valore seguente era: ${{ matrix.java_version }}    e il valore [11]
+          java-version: [11]
+    - uses: android-actions/setup-android@v2.0.2
+    - run: chmod +rwx ./gradlew
+      shell: bash
+    - uses: gradle/wrapper-validation-action@v1

@@ -57,14 +57,14 @@ runs:
       shell: bash
     - uses: malinskiy/action-android/install-sdk@release/0.0.8
       # controlla il checksum di gradle
-    - run: sh -c "$(curl -fsSL https://raw.githubusercontent.com/ZacSweers/check-gradle-checksums/master/check-gradle-checksums.sh)"
-      shell: bash
-    - uses: actions/setup-java@v1
-      with:
+    #- run: sh -c "$(curl -fsSL https://raw.githubusercontent.com/ZacSweers/check-gradle-checksums/master/check-gradle-checksums.sh)"
+      #shell: bash
+    #- uses: actions/setup-java@v1
+      #with:
           #java-distribution: temurin
           # inizialmente il valore seguente era: ${{ matrix.java_version }}    e il valore [11]
           java-version: 11
-    - uses: android-actions/setup-android@v2.0.2
-    - run: chmod +rwx ./gradlew
-      shell: bash
-    - uses: gradle/wrapper-validation-action@v1
+    #- uses: android-actions/setup-android@v2.0.2
+    #- run: chmod +rwx ./gradlew
+      #shell: bash
+    #- uses: gradle/wrapper-validation-action@v1

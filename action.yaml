@@ -75,7 +75,7 @@ runs:
       uses: actions/setup-java@v1
       with:
           #java-distribution: temurin
-          java-version: 11
+          java-version: ${{inputs.java-version}}
     #- uses: actions/setup-java@v1
       #with:
           #java-distribution: temurin

@@ -18,6 +18,6 @@ jobs:
         uses: ./
         with:
           who-to-greet: 'Mona the Octocat'
-          java-version: 12
+          java-version: 11
       - run: echo random-number ${{ steps.foo.outputs.random-number }}
         shell: bash

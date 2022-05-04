@@ -74,7 +74,7 @@ runs:
       shell: bash
     # Il nome originario mostrava la versione SCELTA DI JAVA!!!!! Install JDK ${{ matrix.java_version }}
     # cosi come pure la installava: java-version: ${{ matrix.java_version }}
-    - name: Install JDK ${{inputs.who-to-greet }} e ${{inputs.java-version}}
+    - name: Install JDK ${{inputs.java-version}}
       uses: actions/setup-java@v1
       with:
           #java-distribution: temurin
@@ -82,17 +82,17 @@ runs:
     - name: Setup Android SDK Tools
       uses: android-actions/setup-android@v2.0.2
      #ORIGINARIAMENTE SOLO +x
-    - name: Change wrapper permissions
-      run: chmod +rwx ./gradlew
-      shell: bash
+    #- name: Change wrapper permissions
+      #run: chmod +rwx ./gradlew
+      #shell: bash
     # Forse e' un doppione di quello sopra
-    - name: Gradle Wrapper Validation
-      uses: gradle/wrapper-validation-action@v1
+    #- name: Gradle Wrapper Validation
+      #uses: gradle/wrapper-validation-action@v1
         
-    - name: Configure Gradle
+    #- name: Configure Gradle
       # Initial gradle configuration, install dependencies, etc
-      run: ./gradlew help  
-      shell: bash
+      #run: ./gradlew help  
+      #shell: bash
     #- uses: actions/setup-java@v1
       #with:
           #java-distribution: temurin

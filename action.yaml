@@ -1,4 +1,7 @@
 # action.yml 
+# AGGIORNARE LE VERSIONI DI TUTTE LE DIPENDENZE!!!!
+# RIVERIFICARE IL FUNZIONAMENTO E RIDURLE QUANDO POSSIBILE!!!!!!!
+
 #name: 'Barsali_Hello_World'
 #description: 'Greet someone and record the time'
 #inputs:
@@ -76,6 +79,20 @@ runs:
       with:
           #java-distribution: temurin
           java-version: ${{inputs.java-version}}
+    - name: Setup Android SDK Tools
+      uses: android-actions/setup-android@v2.0.2
+     #ORIGINARIAMENTE SOLO +x
+    - name: Change wrapper permissions
+      run: chmod +rwx ./gradlew
+      shell: bash
+    # Forse e' un doppione di quello sopra
+    - name: Gradle Wrapper Validation
+      uses: gradle/wrapper-validation-action@v1
+        
+    - name: Configure Gradle
+      # Initial gradle configuration, install dependencies, etc
+      run: ./gradlew help  
+      shell: bash
     #- uses: actions/setup-java@v1
       #with:
           #java-distribution: temurin

@@ -82,9 +82,9 @@ runs:
     - name: Setup Android SDK Tools
       uses: android-actions/setup-android@v2.0.2
      #ORIGINARIAMENTE SOLO +x
-    #- name: Change wrapper permissions
-      #run: chmod +rwx ./gradlew
-      #shell: bash
+    - name: Change wrapper permissions
+      run: chmod +rwx ./gradlew
+      shell: bash
     # Forse e' un doppione di quello sopra
     #- name: Gradle Wrapper Validation
       #uses: gradle/wrapper-validation-action@v1

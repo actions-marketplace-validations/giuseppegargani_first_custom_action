@@ -39,6 +39,10 @@ inputs:
     description: 'Who to greet'
     required: true
     default: 'World'
+  java-version: # input relativo alla versione di Jdk
+    description: 'Which Jdk version to install'
+    required: false
+    default: '11'
 outputs:
   random-number:
     description: "Random number"
@@ -67,7 +71,7 @@ runs:
       shell: bash
     # Il nome originario mostrava la versione SCELTA DI JAVA!!!!! Install JDK ${{ matrix.java_version }}
     # cosi come pure la installava: java-version: ${{ matrix.java_version }}
-    - name: Install JDK 11
+    - name: Install JDK ${{inputs.who-to-greet }} e ${{inputs.java-version}}
       uses: actions/setup-java@v1
       with:
           #java-distribution: temurin

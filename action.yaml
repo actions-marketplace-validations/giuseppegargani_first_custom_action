@@ -56,13 +56,22 @@ runs:
     - run: goodbye.sh
       shell: bash
     # qui comincia quello piu' specifico per android report!!!!
+    # si puo' anche mettere name per miglior organizzazione!!!!
     - name: install coreutils for macOs
       run: brew install coreutils
       shell: bash
     - uses: malinskiy/action-android/install-sdk@release/0.0.8
       # controlla il checksum di gradle
-    - run: sh -c "$(curl -fsSL https://raw.githubusercontent.com/ZacSweers/check-gradle-checksums/master/check-gradle-checksums.sh)"
+    - name: Check Gradle checksum
+      run: sh -c "$(curl -fsSL https://raw.githubusercontent.com/ZacSweers/check-gradle-checksums/master/check-gradle-checksums.sh)"
       shell: bash
+    # Il nome originario mostrava la versione SCELTA DI JAVA!!!!! Install JDK ${{ matrix.java_version }}
+    # cosi come pure la installava: java-version: ${{ matrix.java_version }}
+    - name: Install JDK 11
+      uses: actions/setup-java@v1
+      with:
+          #java-distribution: temurin
+          java-version: ${{ matrix.java_version }}
     #- uses: actions/setup-java@v1
       #with:
           #java-distribution: temurin

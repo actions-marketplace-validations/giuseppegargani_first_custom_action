@@ -1,6 +1,7 @@
-# action.yml 
+# action.yml
 # AGGIORNARE LE VERSIONI DI TUTTE LE DIPENDENZE!!!!
 # RIVERIFICARE IL FUNZIONAMENTO E RIDURLE QUANDO POSSIBILE!!!!!!!
+# CONTINUE-ON-ERROR Si puo' mettere continue-on-error: true
 
 #name: 'Barsali_Hello_World'
 #description: 'Greet someone and record the time'
@@ -46,6 +47,14 @@ inputs:
     description: 'Which Jdk version to install'
     required: false
     default: '11'
+  api-level:
+    description: 'Which API for instrumented Test '
+    required: false
+    default: '29'
+  arch:
+    description: 'Which architecture for instrumented test'
+    required: false
+    default: 'x86'
 outputs:
   random-number:
     description: "Random number"
@@ -59,7 +68,7 @@ runs:
       run: echo "::set-output name=random-number::$(echo $RANDOM)"
       shell: bash
     - run: echo "${{ github.action_path }}" >> $GITHUB_PATH
-      shell: bash          
+      shell: bash
     - run: goodbye.sh
       shell: bash
     # qui comincia quello piu' specifico per android report!!!!
@@ -81,24 +90,146 @@ runs:
           java-version: ${{inputs.java-version}}
     - name: Setup Android SDK Tools
       uses: android-actions/setup-android@v2.0.2
+
      #ORIGINARIAMENTE SOLO +x
     - name: Change wrapper permissions
       run: chmod +rwx ./gradlew
       shell: bash
+
     # Forse e' un doppione di quello sopra
-    #- name: Gradle Wrapper Validation
-      #uses: gradle/wrapper-validation-action@v1
-        
-    #- name: Configure Gradle
-      # Initial gradle configuration, install dependencies, etc
-      #run: ./gradlew help  
-      #shell: bash
-    #- uses: actions/setup-java@v1
-      #with:
-          #java-distribution: temurin
-          # inizialmente il valore seguente era: ${{ matrix.java_version }}    e il valore [11]
-          #java-version: 11
-    #- uses: android-actions/setup-android@v2.0.2
-    #- run: chmod +rwx ./gradlew
-      #shell: bash
-    #- uses: gradle/wrapper-validation-action@v1
+    - name: Gradle Wrapper Validation
+      uses: gradle/wrapper-validation-action@v1
+
+    - name: Configure Gradle
+    # Initial gradle configuration, install dependencies, etc
+      run: ./gradlew help
+      shell: bash
+
+    # Si può usare assemble invece di build (che è assemble + check)
+    # build is effectively assemble + check (and check is test + any linting tasks).
+    - name: Build Project
+      # assemble --stacktrace
+      run: ./gradlew assemble --stacktrace
+      shell: bash
+
+    # comando veramente di base (ma ricordiamo che e' possibile skippare i tests direttamente nella classe di android)
+    - name: Testa
+      run: ./gradlew test
+      shell: bash
+
+    # E converte in yaml e json
+    # SI DEVE RELATIVIZZARE CON LA PATH RELATIVA AL PACKAGE !!!!!!!!!
+    - uses: fabasoad/yaml-json-xml-converter-action@main
+      id: xml2yaml
+      with:
+        path: 'app/build/test-results/testDebugUnitTest/TEST-com.example.experimental.ExampleUnitTest.xml'
+        from: 'xml'
+        to: 'yaml'
+    - name: Print xml2json result
+      continue-on-error: true
+      run: echo "${{ steps.xml2yaml.outputs.data }}"
+      shell: bash
+
+    # Stampa delle variabili ambientali per cercare il relative package!!!!!
+    - name: echo-default-env-variables
+      run: |
+          echo "Home: ${HOME}"
+          echo "GITHUB_WORKFLOW: ${GITHUB_WORKFLOW}"
+          echo "GITHUB_ACTIONS: ${GITHUB_ACTIONS}"
+          echo "GITHUB_ACTOR: ${GITHUB_ACTOR}"
+          echo "GITHUB_REPOSITORY: ${GITHUB_REPOSITORY}"
+          echo "GITHUB_EVENT_NAME: ${GITHUB_EVENT_NAME}"
+          echo "GITHUB_WORKSPACE: ${GITHUB_WORKSPACE}"
+          echo "GITHUB_SHA: ${GITHUB_SHA}"
+          echo "GITHUB_REF: ${GITHUB_REF}"
+          echo "GITHUB_BASE_REF: ${GITHUB_BASE_REF}"
+      shell: bash
+
+    # Con il vecchio metodo di salvare su Firebase
+#    - name: Update latest version in realtime database
+#        uses: w9jds/firebase-trigger@master
+#          #env:
+#        #GITHUB_CONTEXT: ${{ toJSON(github.repository) }}
+#        #NOME_REPOSITORY:
+#        with:
+#          credentials: ${{ secrets.FIREBASE_CREDENTIALS }}
+#          databaseUrl: https://databasericette-beeb7.firebaseio.com
+#          path: "${{ github.repository }}"
+#          #Si devono mettere come segreto!!!
+#          value: "${{ github.repository }}"
+
+    #vecchio test
+    - name: Run Instrumentation Tests (reactivecircus)
+      continue-on-error: true
+      uses: reactivecircus/android-emulator-runner@v2.6.1
+      with:
+        api-level: ${{inputs.api-level}}
+        arch: ${{inputs.arch}}
+        target: default
+        #arch: x86
+        profile: Nexus 6
+        script: |
+            ./gradlew connectedCheck
+            ./gradlew connectedAndroidTest
+            ls app/build/outputs/androidTest-results/connected
+            ls app/build/outputs/apk/androidTest
+            ls app/build/outputs/apk/debug
+            ls app/build/outputs/apk/release
+            adb install app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+            adb install app/build/outputs/apk/debug/app-debug.apk
+            adb shell pm list instrumentation
+            adb shell am instrument -w -e class com.example.experimental.ExampleInstrumentedTest com.example.experimental.test/androidx.test.runner.AndroidJUnitRunner
+            adb shell ls sdcard/Android/data/com.example.experimental/files
+            adb shell cat sdcard/Android/data/com.example.experimental/files/JsonTestReport.json
+            adb pull sdcard/Android/data/com.example.experimental/files/JsonTestReport.json app
+            ls
+            ls app
+            ./gradlew leggiReport
+            echo FILEREPORT=app/JsonTestReport.json >> $GITHUB_ENV
+            #adb devices
+            #adb shell ls sdcard/Android/data
+            #script: ./gradlew connectedCheck --stacktrace
+            #script: adb shell am instrument -w -e class com.example.tests_vari.ExampleInstrumentedTest  com.example.tests_vari.test/androidx.test.runner.AndroidJUnitRunner --rerun-tasks
+        shell: bash
+        env:
+        ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+
+    - name: Reclaim Memory
+      run: ./gradlew --stop && jps|grep -E 'KotlinCompileDaemon|GradleDaemon'| awk '{print $1}'| xargs kill -9
+      shell: bash
+
+    - name: upload test in Json file
+      uses: actions/upload-artifact@v2.2.4
+      with:
+        name: test
+        path: app/JsonTestReport.json
+
+#deploy:
+#  name: Deploy
+#  needs: build
+#  runs-on: ubuntu-latest
+#  permissions:
+#      checks: write
+#      contents: read
+#      issues: read
+#      pull-requests: write
+#  steps:
+#        # carica artifact con risultati test per leggerlo ed inviarlo
+#      - uses: actions/download-artifact@v2
+#        with:
+#        name: test
+#
+#        - name: Verifica File
+#          run: |
+#            ls
+#            cat ./JsonTestReport.json
+#            cat JsonTestReport.json
+#            `cat JsonTestReport.json`
+#          shell: bash
+#
+#        - name: Operazioni Firebase DB
+#          uses: w9jds/firebase-action@master
+#          with:
+#            args: database:set --force --debug  --project databasericette-beeb7 /giuseppegargani/ecchime JsonTestReport.json
+#          env:
+#            GCP_SA_KEY: ${{ secrets.FIREBASE_CREDENTIALS }}

@@ -122,7 +122,7 @@ runs:
     - uses: fabasoad/yaml-json-xml-converter-action@main
       id: xml2yaml
       with:
-        path: 'app/build/test-results/testDebugUnitTest/TEST-com.example.experimental.ExampleUnitTest.xml'
+        path: 'app/build/test-results/testDebugUnitTest/TEST-com.example.trialproject.ExampleUnitTest.xml'
         from: 'xml'
         to: 'yaml'
     - name: Print xml2json result
@@ -178,10 +178,10 @@ runs:
             adb install app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
             adb install app/build/outputs/apk/debug/app-debug.apk
             adb shell pm list instrumentation
-            adb shell am instrument -w -e class com.example.experimental.ExampleInstrumentedTest com.example.experimental.test/androidx.test.runner.AndroidJUnitRunner
-            adb shell ls sdcard/Android/data/com.example.experimental/files
-            adb shell cat sdcard/Android/data/com.example.experimental/files/JsonTestReport.json
-            adb pull sdcard/Android/data/com.example.experimental/files/JsonTestReport.json app
+            adb shell am instrument -w -e class com.example.trialproject.ExampleInstrumentedTest com.example.trialproject.test/androidx.test.runner.AndroidJUnitRunner
+            adb shell ls sdcard/Android/data/com.example.trialproject/files
+            adb shell cat sdcard/Android/data/com.example.trialproject/files/JsonTestReport.json
+            adb pull sdcard/Android/data/com.example.trialproject/files/JsonTestReport.json app
             ls
             ls app
             ./gradlew leggiReport
@@ -189,7 +189,7 @@ runs:
             #adb devices
             #adb shell ls sdcard/Android/data
             #script: ./gradlew connectedCheck --stacktrace
-            #script: adb shell am instrument -w -e class com.example.tests_vari.ExampleInstrumentedTest  com.example.tests_vari.test/androidx.test.runner.AndroidJUnitRunner --rerun-tasks
+            #script: adb shell am instrument -w -e class com.example.trialproject.ExampleInstrumentedTest  com.example.trialproject.test/androidx.test.runner.AndroidJUnitRunner --rerun-tasks
         shell: bash
         env:
         ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
